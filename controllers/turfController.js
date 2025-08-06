@@ -65,19 +65,37 @@ export const createTurfReview = async (req, res) => {
 };
 
 export const searchTurfs = async (req, res) => {
-  const { query } = req.query;
+  const { query = '', sport = '' } = req.query;
 
   try {
-    const turfs = await Turf.find({
+    const filters = {
       $or: [
         { name: { $regex: query, $options: 'i' } },
         { location: { $regex: query, $options: 'i' } },
       ],
-    });
+    };
 
+    if (sport) {
+      filters.sport = sport;
+    }
+
+    const turfs = await Turf.find(filters);
     res.json(turfs);
   } catch (error) {
     console.error('Search error:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const getTurfById = async (req, res) => {
+  try {
+    const turf = await Turf.findById(req.params.id);
+    if (!turf) {
+      return res.status(404).json({ message: 'Turf not found' });
+    }
+    res.json(turf);
+  } catch (error) {
+    console.error('Error fetching turf by ID:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
