@@ -7,7 +7,6 @@ import {
   getTurfById,
   searchTurfs
 } from '../controllers/turfController.js';
-import generateSlots from '../utils/slots.js';
 import { getAvailableSlots } from '../controllers/getAvailableSlots.js';
 import { protect } from '../middlewares/authMiddleware.js';
 import { createTurfReview } from '../controllers/turfController.js';
@@ -20,9 +19,6 @@ router.route('/:id').put(protect, updateTurf).delete(protect, deleteTurf);
 router.post('/:id/reviews', protect, createTurfReview);
 router.get('/search', searchTurfs);
 router.get('/:id', getTurfById);
-router.get('/:turfId/available-slots', getAvailableSlots);
-router.get('/slots', (req, res) => {
-  res.json(generateSlots());
-});
+router.get('/:turfId/slots', getAvailableSlots);
 
 export default router;
