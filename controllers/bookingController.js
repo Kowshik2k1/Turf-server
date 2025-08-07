@@ -1,5 +1,7 @@
 import Booking from '../models/Booking.js';
 import Turf from '../models/Turf.js';
+import User from '../models/User.js';
+import { sendBookingConfirmation } from '../utils/sendEmail.js';
 
 export const createBooking = async (req, res) => {
   try {
@@ -39,6 +41,16 @@ export const createBooking = async (req, res) => {
     });
 
     await booking.save();
+
+    const user = await User.findById(userId);
+    if (user && user.email) {
+      await sendBookingConfirmation(user.email, {
+        turfName: turf.name,
+        venueName: turf.venues.find(v => v._id.toString() === venue)?.name || 'Venue',
+        date,
+        slot,
+      });
+    }
 
     res.status(201).json({ message: 'Booking successful', booking });
   } catch (err) {
